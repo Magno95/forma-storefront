@@ -1,0 +1,31 @@
+{
+  "name": "forma-storefront",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.0.5",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "next": "15.5.29",
+    "react": "~19.1.0",
+    "react-dom": "~19.1.0",
+    "web-vitals": "^5.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~5.9.3"
+  }
+}
