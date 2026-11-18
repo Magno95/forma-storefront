@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { expect, test, type Page } from "@playwright/test";
+import { signIn } from "./access-fixture";
 
 async function fillAddress(page: Page, postcode = "20121") {
   await page.getByLabel("Full name").fill("Alex Example");
@@ -11,6 +12,7 @@ async function fillAddress(page: Page, postcode = "20121") {
 }
 
 test("checks out with Apple Pay demo, updates quantity, and reloads the receipt", async ({ page }) => {
+  await signIn(page.request);
   await page.goto("/en");
   await expect(page.getByRole("heading", { name: "Let the night take shape." })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Designed for the night." })).toBeVisible();
@@ -47,6 +49,7 @@ test("checks out with Apple Pay demo, updates quantity, and reloads the receipt"
 });
 
 test("server validates the cart, totals, payment and repeated checkout", async ({ request }) => {
+  await signIn(request);
   const checkout = {
     name: "Alex Example",
     email: "alex@example.test",
@@ -78,6 +81,7 @@ test("server validates the cart, totals, payment and repeated checkout", async (
 });
 
 test("emits visits and clicks after consent", async ({ page }) => {
+  await signIn(page.request);
   await page.route("https://www.googletagmanager.com/**", (route) =>
     route.fulfill({ contentType: "text/javascript", body: "/* GTM stub */" }),
   );

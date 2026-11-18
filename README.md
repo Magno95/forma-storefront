@@ -26,7 +26,7 @@ pnpm exec playwright install chromium
 pnpm test
 ```
 
-Playwright verifica home, configurazione, aggiornamento del carrello, validazione lato server, Apple Pay demo, conferma al refresh, retry con lo stesso identificatore e contratto del `dataLayer`. Per testare una Preview accessibile, passa `TEST_BASE_URL=https://<preview>.vercel.app`.
+Playwright verifica anche accesso, logout e richieste anonime a pagine, API e asset. Per testare una Preview, imposta `TEST_BASE_URL` con il suo URL e `TEST_SITE_ACCESS_KEY` con la chiave dell’ambiente.
 
 ## MockService
 
@@ -47,6 +47,20 @@ Il server ricalcola prezzi e spedizione e valida il totale mostrato prima di con
 | --- | --- | --- | --- |
 | `staging` | Preview | URL di branch assegnato da Vercel | GTM di test, profilo mock selezionato per QA |
 | `main` | Production | `forma.davidemagnoni.it` proposto | GTM di produzione, `MOCK_SCENARIO=normal` |
+
+### Accesso privato
+
+Genera una chiave per ambiente e salvala esclusivamente come variabile server `SITE_ACCESS_KEY` in **Vercel → Settings → Environment Variables**. Usa la stessa procedura per Preview e Production, con chiavi distinte.
+
+```sh
+node -p "require('node:crypto').randomBytes(32).toString('base64url')"
+```
+
+Dopo il deploy, apri l’URL normale della pagina. Forma chiede la chiave e, dopo la verifica, rilascia un cookie firmato di 24 ore. Il cookie è HttpOnly, SameSite=Lax e Secure su HTTPS. Il link **Esci** nel footer chiude la sessione nel browser. La rotazione della chiave dopo un redeploy invalida tutte le sessioni precedenti.
+
+Le build di Preview e Production richiedono l’accesso anche con chiave assente o malformata. Il middleware protegge pagine, richieste RSC, API e asset del dominio. Per provare l’accesso in locale, aggiungi `SITE_ACCESS_KEY` a `.env.local` e riavvia `pnpm dev`.
+
+### Pubblicazione
 
 1. Importa la repository GitHub in Vercel con preset Next.js e Node 22. Configura `main` come Production Branch. Il lockfile e `packageManager` gestiscono l'installazione. La Git integration genera la Preview al push di `staging`.
 2. Dopo i controlli sulla Preview e sulla CI, apri la PR `staging → main`. Il merge avvia la build Production con le variabili del suo ambiente.

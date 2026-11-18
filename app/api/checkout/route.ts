@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mockService } from "@/lib/mock-service";
 import { readJson } from "@/lib/request";
+import { privateHeaders, requestHasSiteAccess } from "@/lib/site-access";
 import { paymentMethods, summarize } from "@/lib/store";
 import { cartCookie, mockError, noStore, readCart, readReceipt, receiptCookie, setStoreCookie, validateCheckout } from "@/lib/store-server";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  if (!await requestHasSiteAccess(request)) return new Response(null, { status: 401, headers: privateHeaders });
   try {
     const options = await mockService.run("payment-options", () => ({ methods: paymentMethods }), request.signal);
     return Response.json(options, { headers: noStore });
@@ -14,6 +16,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!await requestHasSiteAccess(request)) return new Response(null, { status: 401, headers: privateHeaders });
   const data = await readJson(request);
   if (!data) return NextResponse.json({ error: "invalid_body" }, { status: 400, headers: noStore });
 

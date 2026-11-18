@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { mockService } from "@/lib/mock-service";
 import { readJson } from "@/lib/request";
+import { privateHeaders, requestHasSiteAccess } from "@/lib/site-access";
 import { lineKey, maxQuantity } from "@/lib/store";
 import { cartCookie, mockError, noStore, parseLine, readCart, setStoreCookie } from "@/lib/store-server";
 
 export async function POST(request: NextRequest) {
+  if (!await requestHasSiteAccess(request)) return new Response(null, { status: 401, headers: privateHeaders });
   const data = await readJson(request);
   const action = data?.action;
   const line = parseLine(data, action === "set" ? 0 : 1);

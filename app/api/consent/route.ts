@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { consentCookie, consentMaxAge } from "@/lib/model";
 import { readJson } from "@/lib/request";
+import { privateHeaders, requestHasSiteAccess } from "@/lib/site-access";
 
 export async function POST(request: NextRequest) {
+  if (!await requestHasSiteAccess(request)) return new Response(null, { status: 401, headers: privateHeaders });
   const body = await readJson(request);
   const choice = body?.choice;
   if (choice !== "granted" && choice !== "denied") {

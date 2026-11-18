@@ -5,6 +5,7 @@ import { StorefrontAnalytics } from "@/components/storefront-analytics";
 import { copy } from "@/lib/copy";
 import { isLocale, locales } from "@/lib/model";
 import { storePath } from "@/lib/paths";
+import { isSiteAccessRequired } from "@/lib/site-access";
 import "@/app/globals.css";
 
 export function generateStaticParams() {
@@ -42,6 +43,13 @@ export default async function LocaleLayout({
         <footer className="site-footer">
           <div className="shell flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
             <p>{labels.demo}</p>
+            {isSiteAccessRequired() && (
+              <form action="/access" method="post">
+                <input type="hidden" name="action" value="logout" />
+                <input type="hidden" name="next" value={storePath(locale, "home")} />
+                <button type="submit" className="footer-action">{locale === "it" ? "Esci" : "Sign out"}</button>
+              </form>
+            )}
             <Consent labels={{
               privacy: labels.privacy,
               consentTitle: labels.consentTitle,
